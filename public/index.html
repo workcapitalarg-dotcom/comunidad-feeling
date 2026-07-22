@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+    <title>Comunidad Feeling</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0C0F1D" />
+    <!-- iOS / Safari PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Feeling" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+  </head>
+  <body style="margin:0; padding:0; background-color:#0C0F1D; overflow:hidden;">
+    <div id="root"></div>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').then(function(registration) {
+            console.log('PWA ServiceWorker registrado con exito:', registration.scope);
+          }, function(err) {
+            console.log('PWA ServiceWorker fallo al registrar:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
