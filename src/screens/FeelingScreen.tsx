@@ -343,19 +343,23 @@ function CarouselTab({ tipo, isActive }: { tipo: 'galeria' | 'novedades', isActi
   useEffect(() => {
     if (isPaused || items.length <= 1) return;
     timerRef.current = setInterval(() => {
-      const nextIndex = currentIndex + 1;
-      if (nextIndex >= items.length) {
-        flatListRef.current?.scrollToIndex({ index: 0, animated: false });
-        setCurrentIndex(0);
-      } else {
-        flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-        setCurrentIndex(nextIndex);
+      const nextIndex = (currentIndex + 1) % items.length;
+      const targetOffset = nextIndex * SCREEN_W;
+      
+      if (flatListRef.current) {
+        try {
+          flatListRef.current.scrollToOffset({
+            offset: targetOffset,
+            animated: nextIndex !== 0,
+          });
+        } catch (e) {
+          flatListRef.current.scrollToIndex({ index: nextIndex, animated: nextIndex !== 0 });
+        }
       }
+      setCurrentIndex(nextIndex);
     }, CAROUSEL_INTERVAL_MS);
     return () => clearInterval(timerRef.current);
   }, [items, isPaused, currentIndex]);
-
-  // (Movido arriba para el cálculo de isPaused)
 
   const handleTouchStart = () => {
     setTempPaused(true);
@@ -385,11 +389,18 @@ function CarouselTab({ tipo, isActive }: { tipo: 'galeria' | 'novedades', isActi
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyExtractor={item => item.id}
-        initialNumToRender={3}
-        maxToRenderPerBatch={3}
+        initialNumToRender={items.length || 5}
+        maxToRenderPerBatch={items.length || 5}
         windowSize={5}
         removeClippedSubviews={false} // Evita que libere la imagen de la memoria al salir de pantalla
-        onScrollToIndexFailed={() => {}}
+        getItemLayout={(_, index) => ({
+          length: SCREEN_W,
+          offset: SCREEN_W * index,
+          index,
+        })}
+        onScrollToIndexFailed={(info) => {
+          flatListRef.current?.scrollToOffset({ offset: info.index * SCREEN_W, animated: false });
+        }}
         onScrollBeginDrag={handleTouchStart}
         onScrollEndDrag={handleTouchEnd}
         onMomentumScrollEnd={(e) => {

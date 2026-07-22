@@ -403,14 +403,20 @@ function BiografiaSection({ data }: { data: any }) {
   useEffect(() => {
     if (isPaused || items.length <= 1) return;
     timerRef.current = setInterval(() => {
-      const nextIndex = currentIndex + 1;
-      if (nextIndex >= items.length) {
-        flatListRef.current?.scrollToIndex({ index: 0, animated: false });
-        setCurrentIndex(0);
-      } else {
-        flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-        setCurrentIndex(nextIndex);
+      const nextIndex = (currentIndex + 1) % items.length;
+      const targetOffset = nextIndex * CARD_WIDTH;
+
+      if (flatListRef.current) {
+        try {
+          flatListRef.current.scrollToOffset({
+            offset: targetOffset,
+            animated: nextIndex !== 0,
+          });
+        } catch (e) {
+          flatListRef.current.scrollToIndex({ index: nextIndex, animated: nextIndex !== 0 });
+        }
       }
+      setCurrentIndex(nextIndex);
     }, 5000); // 5 segundos como en Galeria
     return () => clearInterval(timerRef.current);
   }, [items, isPaused, currentIndex]);
@@ -437,9 +443,17 @@ function BiografiaSection({ data }: { data: any }) {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyExtractor={item => item.id}
-        initialNumToRender={3}
-        maxToRenderPerBatch={3}
+        initialNumToRender={items.length || 5}
+        maxToRenderPerBatch={items.length || 5}
         windowSize={5}
+        getItemLayout={(_, index) => ({
+          length: CARD_WIDTH,
+          offset: CARD_WIDTH * index,
+          index,
+        })}
+        onScrollToIndexFailed={(info) => {
+          flatListRef.current?.scrollToOffset({ offset: info.index * CARD_WIDTH, animated: false });
+        }}
         onScrollBeginDrag={handleTouchStart}
         onScrollEndDrag={handleTouchEnd}
         onMomentumScrollEnd={(e) => {
