@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, Platform } from 'react-native';
+import { View, Text, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HomeScreen from '../screens/HomeScreen';
@@ -9,7 +10,6 @@ import AgendaScreen from '../screens/AgendaScreen';
 import ContactoScreen from '../screens/ContactoScreen';
 import MenuScreen from '../screens/MenuScreen';
 import DevToolsFAB from '../components/DevToolsFAB';
-import { View } from 'react-native';
 
 // ============================================================
 // NAVEGADOR PRINCIPAL — Bottom Tabs con 5 pestañas
@@ -18,9 +18,44 @@ import { View } from 'react-native';
 const Tab = createBottomTabNavigator();
 
 function TabIcon({ name, focused, color }: { name: string; focused: boolean; color: string }) {
+  const { colorTheme } = useTheme();
+  const isDark = colorTheme.statusBarStyle === 'light';
+
+  if (name === 'Menú') {
+    const iconColor = focused 
+      ? colorTheme.accent 
+      : (isDark ? '#FFFFFF' : colorTheme.textPrimary);
+
+    return (
+      <View
+        style={{
+          backgroundColor: isDark
+            ? (focused ? 'rgba(255, 255, 255, 0.22)' : 'rgba(255, 255, 255, 0.12)')
+            : (focused ? colorTheme.accent + '22' : 'rgba(0, 0, 0, 0.05)'),
+          paddingHorizontal: 8,
+          paddingVertical: 3,
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: isDark
+            ? (focused ? colorTheme.accent : 'rgba(255, 255, 255, 0.35)')
+            : (focused ? colorTheme.accent : 'rgba(0, 0, 0, 0.1)'),
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Ionicons
+          name={focused ? "menu" : "menu-outline"}
+          size={focused ? 20 : 18}
+          color={iconColor}
+        />
+      </View>
+    );
+  }
+
   const icons: Record<string, string> = {
-    Inicio: '🏠', Feeling: '✨', Agenda: '📅', Contacto: '👤', Menú: '☰',
+    Inicio: '🏠', Feeling: '✨', Agenda: '📅', Contacto: '👤',
   };
+
   return (
     <Text style={{ fontSize: focused ? 24 : 20, opacity: focused ? 1 : 0.6 }}>
       {icons[name] || '●'}

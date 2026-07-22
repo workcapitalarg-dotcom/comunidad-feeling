@@ -284,7 +284,7 @@ export const COLOR_THEMES: Record<ColorThemeId, ColorTheme> = {
   },
 };
 
-export const DEFAULT_COLOR_THEME: ColorThemeId = 'frio_profundo';
+export const DEFAULT_COLOR_THEME: ColorThemeId = 'azul_cards_claro_1';
 
 // Orden para el desplegable dev
 export const COLOR_THEME_ORDER: ColorThemeId[] = [
